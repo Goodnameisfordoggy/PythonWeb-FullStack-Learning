@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="static/bootstrap-4.4.1-dist/css/bootstrap.css">
+    <style>
+        .login-box{
+            margin-top: 100px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 0px 30px 30px 30px;
+        }
+        .login-box h1{
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!--action为提交地址，不设置默认提交到当前页面地址-->
+    <div class="login-box">
+        <h1>用户登录</h1>
+        <form method="post" action="/login">
+            <div class="form-floating">
+                  <select name="role" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+<!--                        <option selected></option>-->
+                        <option value="1">客户</option>
+                        <option value="2">管理员</option>
+                  </select>
+                  <label for="floatingSelect">选择登录身份</label>
+            </div>
+            <div class="mb-3" >
+                <label for="exampleInputMobile" class="form-label">手机号：</label>
+                <input type="text" name="mobile" class="form-control" id="exampleInputMobile" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">We'll never share your mobile number with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="Password" class="form-label">密码：</label>
+                <input type="password" name="pwd" class="form-control" id="Password">
+            </div>
+            <button type="submit" class="btn btn-outline-secondary">登录</button>
+            <span style="color:red; ">{{ error }}</span>
+        </form>
+    </div>
+
+
+    <script src="/static/jquery-3.7.1.min.js"></script>
+    <script src="/static/bootstrap-4.4.1-dist/js/bootstrap.js"></script>
+</body>
+</html>
