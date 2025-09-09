@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="static/bootstrap-4.4.1-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap-5.3.0-alpha1-dist/css/bootstrap.css">
     <style>
         .login-box{
             margin-top: 100px;
@@ -28,27 +28,25 @@
             <div class="form-floating">
                   <select name="role" class="form-select" id="floatingSelect" aria-label="Floating label select example">
 <!--                        <option selected></option>-->
-                        <option value="1">客户</option>
-                        <option value="2">管理员</option>
+                        <option value="1">管理员</option>
+                        <option value="2">客户</option>
                   </select>
                   <label for="floatingSelect">选择登录身份</label>
             </div>
             <div class="mb-3" >
                 <label for="exampleInputMobile" class="form-label">手机号：</label>
-                <input type="text" name="mobile" class="form-control" id="exampleInputMobile" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">We'll never share your mobile number with anyone else.</div>
+                <input type="text" name="mobile" placeholder="请输入手机号" class="form-control" id="exampleInputMobile" aria-describedby="emailHelp">
             </div>
             <div class="mb-3">
                 <label for="Password" class="form-label">密码：</label>
-                <input type="password" name="pwd" class="form-control" id="Password">
+                <input type="password" name="pwd" placeholder="请输入密码" class="form-control" id="Password">
             </div>
-            <button type="submit" class="btn btn-outline-secondary">登录</button>
+            <button type="submit" class="btn btn-outline-success">登录</button>
             <span style="color:red; ">{{ error }}</span>
         </form>
     </div>
 
 
-    <script src="/static/jquery-3.7.1.min.js"></script>
-    <script src="/static/bootstrap-4.4.1-dist/js/bootstrap.js"></script>
+    <script src="/static/bootstrap-5.3.0-alpha1-dist/js/bootstrap.js"></script>
 </body>
 </html>

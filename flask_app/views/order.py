@@ -11,15 +11,42 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
-from flask import Blueprint, session, redirect
+from flask import Blueprint, session, redirect, render_template
+from utils import db
+
+ORDER_STATUS = {
+    1: '待处理',
+    2: '处理中',
+    3: '成功',
+    4: '失败',
+}
 
 # 创建蓝图对象
-order = Blueprint('order', __name__, url_prefix='/order')
+order = Blueprint('order', __name__)
 
-@order.route('/list')
+@order.route('/order/list')
 def order_list():
-    return "订单列表"
+    user_info = session.get('user_info')
+    role = user_info['role']
+    data_list = []
+    if role == 1: # 管理员
+        data_list = db.fetch_all(
+            "select * "
+            "from `order` "
+            "left join userinfo on `order`.user_id = userinfo.id ",
+            []
+        )
+    elif role == 2: # 客户
+        data_list = db.fetch_all(
+            "select * "
+            "from `order` "
+            "left join userinfo on `order`.user_id = userinfo.id "
+            "where user_id=%s ",
+            [user_info['id'], ]
+        )
+    print(data_list)
+    return render_template('order_list.html', order_list=data_list, user_name=user_info['name'])
 
-@order.route('/create')
+@order.route('/order/create')
 def order_create():
     return "创建订单"

@@ -16,7 +16,7 @@ import os
 from flask import Flask, session, redirect, request
 
 
-def auth():
+def authenticate():
     """拦截器"""
     if request.path.startswith("/static"):
         return None
@@ -39,6 +39,6 @@ def create_app():
     app.register_blueprint(order.order)
 
     # 添加拦截器
-    app.before_request(auth)
+    app.before_request(authenticate)
 
     return app

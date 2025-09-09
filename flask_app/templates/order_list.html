@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order List</title>
+    <link rel="stylesheet" href="/static/bootstrap-5.3.0-alpha1-dist/css/bootstrap.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Flask App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- 左侧导航项 -->
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">订单管理</a>
+                    </li>
+                </ul>
+
+                <!-- 右侧下拉菜单 -->
+                <ul class="navbar-nav ms-auto"> <!-- ms-auto 关键类：将这个容器推到右侧 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            {{ user_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end ">
+                            <li>
+                                <a class="dropdown-item" style="font-size: 16px" href="/order/create">
+                                    <img src="/static/icon/plus-square.svg" alt="创建订单图标"
+                                         style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
+                                    创建订单
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">订单编号</th>
+                <th scope="col">网页地址</th>
+                <th scope="col">数量</th>
+                <th scope="col">任务状态</th>
+                <th scope="col">用户</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in order_list %}
+            <tr>
+                <th scope="row">{{ item.id }}</th>
+                <td>{{ item.url }}</td>
+                <td>{{ item.count }}</td>
+                <td>
+                    <div class="d-flex items-center gap-2">
+                        <!-- 根据 item.status 显示不同动画 -->
+                        {% if item.status == 1 %}
+                        <!-- 待处理 -->
+                        <div role="status">
+                            <span class="spinner-border text-warning" style="width: 1rem; height: 1rem;" role="status"
+                                  aria-hidden="true"></span>
+                            <span class="visually text-warning" style="font-weight: bold;">待处理...</span>
+                        </div>
+                        {% elif item.status == 2 %}
+                        <!-- 处理中 -->
+                        <div role="status">
+                            <span class="spinner-border text-info" style="width: 1rem; height: 1rem;" role="status"
+                                  aria-hidden="true"></span>
+                            <span class="visually text-info" style="font-weight: bold;">处理中...</span>
+                        </div>
+                        {% elif item.status == 3 %}
+                        <!-- 成功 -->
+                        <div role="status">
+                            <span class="spinner-grow text-success" style="width: 1rem; height: 1rem;" role="status"
+                                  aria-hidden="true"></span>
+                            <span class="visually text-success" style="font-weight: bold;">成功</span>
+                        </div>
+                        {% elif item.status == 4 %}
+                        <!-- 失败 -->
+                        <div role="status">
+                            <span class="spinner-grow text-danger" style="width: 1rem; height: 1rem;" role="status"
+                                  aria-hidden="true"></span>
+                            <span class="visually text-danger" style="font-weight: bold;">失败</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </td>
+                <td>{{ item.name }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 先引入 Popper.js（生产环境版本，体积小） -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="/static/bootstrap-5.3.0-alpha1-dist/js/bootstrap.js"></script>
+</body>
+</html>

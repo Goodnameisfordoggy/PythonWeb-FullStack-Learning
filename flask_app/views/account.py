@@ -13,6 +13,7 @@ Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
 from flask import Blueprint, render_template, request, redirect, session
 from utils.db import fetch_one
+from utils.logger import LOG
 
 # 创建蓝图对象
 account = Blueprint('account', __name__ )
@@ -29,6 +30,7 @@ def login():
         mobile = request.form['mobile']
         pwd = request.form['pwd']
         print(role, mobile, pwd)
+        LOG.success(f"role:{role} mobile:{mobile} pwd:{pwd}")
         # 校验用户信息
         user_info = fetch_one(
             "select * from userinfo where role=%s and mobile=%s and password=%s",
@@ -37,11 +39,15 @@ def login():
         if not user_info:
             return render_template("login.html", error="用户名或密码错误！")
         else:
-            session["user_info"] = {"id": user_info["id"], "role": user_info["role"], "name": user_info["name"], "mobile": user_info["mobile"], }
+            session["user_info"] = {
+                "id": user_info["id"],
+                "role": user_info["role"],
+                "name": user_info["name"],
+                "mobile": user_info["mobile"],
+            }
             return redirect("/order/list")
     return "登录成功！"
 
 @account.route('/users')
 def users():
-
     return "用户列表"

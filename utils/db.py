@@ -26,11 +26,20 @@ MYSQL_CONN_POOL = PooledDB(
     host="127.0.0.1", port=3306, user="root", passwd="root", charset="utf8", db="flask-app"
 )
 
-def fetch_one(sql, param):
+def fetch_one(sql, param) -> dict | None:
     conn = MYSQL_CONN_POOL.connection()
     cursor = conn.cursor(cursors.DictCursor)
     cursor.execute(sql, param)
     result = cursor.fetchone()
     cursor.close()
-    conn.close()    # 将连接还回pool
+    conn.close()    # 将连接反还回给连接池
+    return result
+
+def fetch_all(sql, param) -> list[dict] | None:
+    conn = MYSQL_CONN_POOL.connection()
+    cursor = conn.cursor(cursors.DictCursor)
+    cursor.execute(sql, param)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()    # 将连接反还回给连接池
     return result
