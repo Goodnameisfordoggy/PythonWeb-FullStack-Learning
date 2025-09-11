@@ -11,7 +11,7 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
-from flask import Blueprint, session, redirect, render_template
+from flask import Blueprint, session, redirect, render_template, request
 from utils import db
 
 ORDER_STATUS = {
@@ -45,8 +45,23 @@ def order_list():
             [user_info['id'], ]
         )
     print(data_list)
-    return render_template('order_list.html', order_list=data_list, user_name=user_info['name'])
+    return render_template('order_list.html', order_list=data_list)
 
-@order.route('/order/create')
+@order.route('/order/create', methods=['GET', 'POST'])
 def order_create():
-    return "创建订单"
+    if request.method == 'GET':
+        return render_template('order_create.html')
+    elif request.method == 'POST':
+        user_info = session.get('user_info')
+        order_info = request.form
+        url = order_info['url']
+        count = order_info['count']
+        # 写入 mysql
+        last_row_id = db.insert_one(
+            "insert into `order` (`url`, `count`, `user_id`, `status`) values (%s, %s, %s, 1) ",
+            [url, count, user_info['id']]
+        )
+        print(last_row_id)
+        # 写入 redis 队列
+    return redirect("/order/list")
+

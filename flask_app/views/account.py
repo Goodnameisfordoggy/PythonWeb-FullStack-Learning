@@ -46,7 +46,6 @@ def login():
                 "mobile": user_info["mobile"],
             }
             return redirect("/order/list")
-    return "登录成功！"
 
 @account.route('/users')
 def users():

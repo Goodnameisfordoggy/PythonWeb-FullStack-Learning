@@ -41,5 +41,14 @@ def fetch_all(sql, param) -> list[dict] | None:
     cursor.execute(sql, param)
     result = cursor.fetchall()
     cursor.close()
-    conn.close()    # 将连接反还回给连接池
+    conn.close()
     return result
+
+def insert_one(sql, param):
+    conn = MYSQL_CONN_POOL.connection()
+    cursor = conn.cursor(cursors.DictCursor)
+    cursor.execute(sql, param)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return cursor.lastrowid
