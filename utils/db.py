@@ -52,3 +52,11 @@ def insert_one(sql, param):
     cursor.close()
     conn.close()
     return cursor.lastrowid
+
+def update_one(sql, param):
+    conn = MYSQL_CONN_POOL.connection()
+    cursor = conn.cursor(cursors.DictCursor)
+    cursor.execute(sql, param)
+    conn.commit()
+    cursor.close()
+    conn.close()

@@ -12,8 +12,10 @@ Description:
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
 from flask_app import create_app
+from utils.cache import start_redis_service
 
 app = create_app()
 
 if __name__ == '__main__':
+    start_redis_service()
     app.run(debug=True)

@@ -12,7 +12,7 @@ Description:
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
 from flask import Blueprint, session, redirect, render_template, request
-from utils import db
+from utils import db, cache
 
 ORDER_STATUS = {
     1: '待处理',
@@ -44,7 +44,6 @@ def order_list():
             "where user_id=%s ",
             [user_info['id'], ]
         )
-    print(data_list)
     return render_template('order_list.html', order_list=data_list)
 
 @order.route('/order/create', methods=['GET', 'POST'])
@@ -61,7 +60,7 @@ def order_create():
             "insert into `order` (`url`, `count`, `user_id`, `status`) values (%s, %s, %s, 1) ",
             [url, count, user_info['id']]
         )
-        print(last_row_id)
         # 写入 redis 队列
+        cache.push_queue(last_row_id, "task_queue")
     return redirect("/order/list")
 

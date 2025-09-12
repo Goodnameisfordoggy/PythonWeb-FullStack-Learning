@@ -29,7 +29,6 @@ def login():
         role = request.form['role']
         mobile = request.form['mobile']
         pwd = request.form['pwd']
-        print(role, mobile, pwd)
         LOG.success(f"role:{role} mobile:{mobile} pwd:{pwd}")
         # 校验用户信息
         user_info = fetch_one(
