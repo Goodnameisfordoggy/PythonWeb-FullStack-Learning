@@ -18,9 +18,11 @@ from flask import Flask, session, redirect, request
 
 def authenticate():
     """拦截器"""
+    # 静态文件放行
     if request.path.startswith("/static"):
         return None
-    if request.path == "/login":
+    # 登录，注册放行
+    if request.path in ["/login", "/register"]:
         return None
     user_info = session.get('user_info')
     if user_info:

@@ -5,10 +5,31 @@
 
 <!-- 填充页面 body 内容 -->
 {% block body %}
+    <!-- 弹窗 -->
+    <div class="modal fade" id="orderDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">删除订单</h1>
+                </div>
+                <div class="modal-body">
+                    确定要删除订单吗？
+                </div>
+                <div class="modal-footer">
+                    <!-- data-bs-dismiss控制Modal的关闭 -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" onclick="confirmDelete()" class="btn btn-danger">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 订单信息表格 -->
     <table class="table table-striped">
         <thead>
         <tr>
             <th scope="col">订单编号</th>
+            <th scope="col">创建时间</th>
             <th scope="col">网页地址</th>
             <th scope="col">数量</th>
             <th scope="col">任务状态</th>
@@ -17,8 +38,10 @@
         </thead>
         <tbody>
         {% for item in order_list %}
+        {% if item.is_deleted == 0 %}
         <tr>
             <th scope="row">{{ item.id }}</th>
+            <td>{{ item.create_time }}</td>
             <td>{{ item.url }}</td>
             <td>{{ item.count }}</td>
             <td>
@@ -56,8 +79,20 @@
                 {% endif %}
             </td>
             <td>{{ item.name }}</td>
+            <td>
+                <a href="javascript:void(0);" onclick="showDeleteConfirm('/order/delete/{{ item.id }}')">
+                    <img src="/static/icon/trash3-fill.svg" alt="删除订单"
+                        style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
+                </a>
+            </td>
         </tr>
+        {% endif %}
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block script %}
+    <script src="/static/js/orderCreateHandler.js"></script>
+    <script src="/static/js/orderDeleteHandler.js"></script>
 {% endblock %}
