@@ -12,13 +12,15 @@ Description:
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
 from flask import Blueprint, render_template, request, redirect, session, jsonify
-from utils.db import fetch_one
+from utils.func import generate_sha256_identifier
 from utils.logger import LOG
+from flask_app.models import User
+from .decorators import admin_required
 
 # 创建蓝图对象
-account = Blueprint('account', __name__ )
+account_bp = Blueprint('account', __name__ )
 
-@account.route('/login', methods=['GET', 'POST'])
+@account_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """用户登录"""
     # GET请求，进入登录页面
@@ -32,26 +34,23 @@ def login():
         pwd = request.form['pwd']
         LOG.success(f"role:{role} mobile:{mobile} pwd:{pwd}")
         # 校验用户信息
-        user_info = fetch_one(
-            "select * from userinfo where role=%s and mobile=%s and password=%s",
-            [role, mobile, pwd]
-        )
+        user_info: User = User.query.filter_by(role=role, mobile=mobile, password=pwd).first()
         if not user_info:
             return render_template("login.html", error="用户名或密码错误！")
         else:
             session["user_info"] = {
-                "id": user_info["id"],
-                "user_identity": user_info["user_identity"],
-                "role": user_info["role"],
-                "name": user_info["name"],
-                "mobile": user_info["mobile"],
+                "id": user_info.id,
+                "user_identity": user_info.user_identity,
+                "role": user_info.role,
+                "name": user_info.name,
+                "mobile": user_info.mobile,
             }
             return redirect("/order/list")
     else:
         return jsonify({"status": "true", "error": "不支持的请求类型"})
 
 
-@account.route('/register', methods=['GET', 'POST'])
+@account_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """用户注册"""
     if request.method == 'GET':
@@ -70,23 +69,49 @@ def register():
         if not password:
             errors['password'] = '密码不能为空'
         elif len(password) < 8:
-            errors['password'] = '密码长度不能少于 6 位'
+            errors['password'] = '密码长度不能少于 8 位'
         if not mobile:
             errors['mobile'] = '手机号不能为空'
         elif len(mobile) != 11:  # 简单验证邮箱格式
             errors['mobile'] = '请输入有效的手机号'
         if errors:
             # 如果有验证错误，返回错误信息
-            return jsonify({"status": "false", "errors": errors})
+            return jsonify({"status": "false", "error": errors})
         # 3.检查数据是否存在
-        if User.query.filter_by(username=username).first():
-            return jsonify({"status": "false", "error": "用户名已被注册"})
-
-        if User.query.filter_by(email=email).first():
+        if User.query.filter_by(name=username).first():
+            return jsonify({"status": "false", "error": "用户名已存在"})
+        if User.query.filter_by(mobile=mobile).first():
             return jsonify({"status": "false", "error": "邮箱已被注册"})
+        # 4.新用户信息写入数据库
+        User.create(
+            user_identity=generate_sha256_identifier(),
+            mobile=mobile,
+            password=password,
+            name=username,
+            role=2,
+        )
     else:
         return jsonify({"status": "true", "error": "不支持的请求类型"})
+    return redirect("/login")
 
-@account.route('/users')
-def users():
-    return "用户列表"
+
+@account_bp.route('/user/delete/<user_identity>', methods=['DELETE'])
+@admin_required
+def user_delete(user_identity):
+    """用户删除"""
+    user: User = User.get_by_user_identity(user_identity)
+    if not user:
+        return jsonify({"success": False, "error": "用户不存在！"}), 404
+    res, msg = user.delete(user_identity)
+    if not res:
+        return jsonify({"success": False, "error": msg}), 500
+    return jsonify({"success": True, "msg": f"用户删除成功"})
+
+
+@account_bp.route('/user/list', methods=['GET', ])
+@admin_required
+def user_list():
+    """用户列表"""
+    active_users = User.query.filter_by(is_deleted=0).all()
+    deleted_users = User.query.filter_by(is_deleted=1).all()
+    return render_template("user_list.html", active_users=active_users, deleted_users=deleted_users)

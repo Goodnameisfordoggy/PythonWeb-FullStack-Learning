@@ -5,25 +5,6 @@
 
 <!-- 填充页面 body 内容 -->
 {% block body %}
-    <!-- 弹窗 -->
-    <div class="modal fade" id="orderDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">删除订单</h1>
-                </div>
-                <div class="modal-body">
-                    确定要删除订单吗？
-                </div>
-                <div class="modal-footer">
-                    <!-- data-bs-dismiss控制Modal的关闭 -->
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" onclick="confirmDelete()" class="btn btn-danger">删除</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- 订单信息表格 -->
     <table class="table table-striped">
         <thead>
@@ -37,10 +18,10 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in order_list %}
+        {% for item in data_list %}
         {% if item.is_deleted == 0 %}
         <tr>
-            <th scope="row">{{ item.id }}</th>
+            <th scope="row">{{ item.order_id }}</th>
             <td>{{ item.create_time }}</td>
             <td>{{ item.url }}</td>
             <td>{{ item.count }}</td>
@@ -50,29 +31,25 @@
                     {% if item.status == 1 %}
                     <!-- 待处理 -->
                     <div role="status">
-                            <span class="spinner-border text-warning" style="width: 1rem; height: 1rem;" role="status"
-                                  aria-hidden="true"></span>
+                        <span class="spinner-border text-warning" style="width: 1rem; height: 1rem;" role="status"></span>
                         <span class="visually text-warning" style="font-weight: bold;">待处理...</span>
                     </div>
                     {% elif item.status == 2 %}
                     <!-- 处理中 -->
                     <div role="status">
-                            <span class="spinner-border text-info" style="width: 1rem; height: 1rem;" role="status"
-                                  aria-hidden="true"></span>
+                        <span class="spinner-border text-info" style="width: 1rem; height: 1rem;" role="status"></span>
                         <span class="visually text-info" style="font-weight: bold;">处理中...</span>
                     </div>
                     {% elif item.status == 3 %}
                     <!-- 成功 -->
                     <div role="status">
-                            <span class="spinner-grow text-success" style="width: 1rem; height: 1rem;" role="status"
-                                  aria-hidden="true"></span>
+                        <span class="spinner-grow text-success" style="width: 1rem; height: 1rem;" role="status"></span>
                         <span class="visually text-success" style="font-weight: bold;">成功</span>
                     </div>
                     {% elif item.status == 4 %}
                     <!-- 失败 -->
                     <div role="status">
-                            <span class="spinner-grow text-danger" style="width: 1rem; height: 1rem;" role="status"
-                                  aria-hidden="true"></span>
+                        <span class="spinner-grow text-danger" style="width: 1rem; height: 1rem;" role="status"></span>
                         <span class="visually text-danger" style="font-weight: bold;">失败</span>
                     </div>
                 </div>
@@ -80,7 +57,7 @@
             </td>
             <td>{{ item.name }}</td>
             <td>
-                <a href="javascript:void(0);" onclick="showDeleteConfirm('/order/delete/{{ item.id }}')">
+                <a href="javascript:void(0);" onclick="showOrderDeleteConfirmModal('{{ item.order_id }}', '{{ item.order_identity }}')">
                     <img src="/static/icon/trash3-fill.svg" alt="删除订单"
                         style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
                 </a>
@@ -93,6 +70,5 @@
 {% endblock %}
 
 {% block script %}
-    <script src="/static/js/orderCreateHandler.js"></script>
-    <script src="/static/js/orderDeleteHandler.js"></script>
+    <script type="module" src="/static/js/orderList.js"></script>
 {% endblock %}

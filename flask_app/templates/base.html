@@ -25,10 +25,10 @@
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">用户管理</a>
+                        <a class="nav-link" href="/user/list">用户管理</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">订单管理</a>
+                        <a class="nav-link" href="/order/list">订单管理</a>
                     </li>
                 </ul>
 
@@ -61,19 +61,22 @@
 
     <!-- 弹窗 -->
     <div class="modal fade" id="baseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+         aria-labelledby="baseModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">成功</h1>
+                    <h1 class="modal-title fs-5" id="baseModalLabel">未设置标题</h1>
                     <!-- data-bs-dismiss控制Modal的关闭 -->
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    您的订单已创建完成！
+                    未设置弹窗内容
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- 取消按钮 -->
+                    <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <!-- 确认按钮 -->
+                    <button type="button" id="confirm" class="btn btn-primary" data-bs-dismiss="modal">确认</button>
                 </div>
             </div>
         </div>

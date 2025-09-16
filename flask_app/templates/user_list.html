@@ -1,0 +1,109 @@
+{% extends "base.html" %} <!-- 声明继承自 base.html -->
+
+<!-- 自定义页面标题 -->
+{% block title %}User List{% endblock %}
+
+<!-- 填充页面 body 内容 -->
+{% block body %}
+<!-- 折叠控制器 -->
+<p>
+    <input type="checkbox" class="btn-check" id="btn-check-outlined1" autocomplete="off" checked>
+    <label class="btn btn-outline-primary" for="btn-check-outlined1" data-bs-toggle="collapse"
+           data-bs-target="#active-users"
+           aria-expanded="false" aria-controls="active-users">
+        用户
+    </label>
+    <input type="checkbox" class="btn-check" id="btn-check-outlined2" autocomplete="off">
+    <label class="btn btn-outline-primary" for="btn-check-outlined2" data-bs-toggle="collapse"
+           data-bs-target="#deleted-users"
+           aria-expanded="false" aria-controls="deleted-users">
+        已删除用户
+    </label>
+</p>
+<!-- 折叠区域 -->
+<div class="collapse collapse-horizontal show" id="active-users">
+    <div class="card card-body">
+        <!-- 未删除的用户信息表格 -->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">名称</th>
+                <th scope="col">创建时间</th>
+                <th scope="col">电话号码</th>
+                <th scope="col">登录密码</th>
+                <th scope="col">权限等级</th>
+                <th scope="col">删除</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in active_users %}
+            <tr>
+                <th scope="row">{{ item.id }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.create_time }}</td>
+                <td>{{ item.mobile }}</td>
+                <td>{{ item.password }}</td>
+                {% if item.role == 1 %}
+                <td>超级管理员</td>
+                {% elif item.role == 2 %}
+                <td>用户</td>
+                {% endif %}
+                <td>
+                    <a href="javascript:void(0);" onclick="showUserDeleteConfirmModal('{{ item.user_identity }}', '{{ item.name }}')">
+                        <img src="/static/icon/trash3-fill.svg" alt="删除用户"
+                             style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="collapse collapse-horizontal" id="deleted-users">
+    <div class="card card-body">
+        <!-- 已删除的用户信息表格 -->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col" style="width: 5%;">#</th>
+                <th scope="col" style="width: 15%;">名称</th>
+                <th scope="col" style="width: 15%;">创建时间</th>
+                <th scope="col" style="width: 10%;">电话号码</th>
+                <th scope="col" style="width: 20%;">登录密码</th>
+                <th scope="col" style="width: 10%;">权限等级</th>
+                <th scope="col" style="width: 5%;">恢复</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in deleted_users %}
+            <tr>
+                <th scope="row">{{ item.id }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.create_time }}</td>
+                <td>{{ item.mobile }}</td>
+                <td>{{ item.password }}</td>
+                {% if item.role == 1 %}
+                <td>超级管理员</td>
+                {% elif item.role == 2 %}
+                <td>用户</td>
+                {% endif %}
+                <td>
+                    <a href="javascript:void(0);"
+                       onclick="">
+                        <img src="/static/icon/trash3-fill.svg" alt="恢复用户"
+                             style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="/static/js/userList.js"></script>
+{% endblock %}
