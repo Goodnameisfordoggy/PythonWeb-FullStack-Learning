@@ -1,0 +1,74 @@
+{% extends "base.html" %} <!-- 声明继承自 base.html -->
+
+<!-- 自定义页面标题 -->
+{% block title %}Order List{% endblock %}
+
+<!-- 填充页面 body 内容 -->
+{% block body %}
+    <!-- 订单信息表格 -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">订单编号</th>
+            <th scope="col">创建时间</th>
+            <th scope="col">网页地址</th>
+            <th scope="col">数量</th>
+            <th scope="col">任务状态</th>
+            <th scope="col">用户</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in data_list %}
+        {% if item.is_deleted == 0 %}
+        <tr>
+            <th scope="row">{{ item.order_id }}</th>
+            <td>{{ item.create_time }}</td>
+            <td>{{ item.url }}</td>
+            <td>{{ item.count }}</td>
+            <td>
+                <div class="d-flex items-center gap-2">
+                    <!-- 根据 item.status 显示不同动画 -->
+                    {% if item.status == 1 %}
+                    <!-- 待处理 -->
+                    <div role="status">
+                        <span class="spinner-border text-warning" style="width: 1rem; height: 1rem;" role="status"></span>
+                        <span class="visually text-warning" style="font-weight: bold;">待处理...</span>
+                    </div>
+                    {% elif item.status == 2 %}
+                    <!-- 处理中 -->
+                    <div role="status">
+                        <span class="spinner-border text-info" style="width: 1rem; height: 1rem;" role="status"></span>
+                        <span class="visually text-info" style="font-weight: bold;">处理中...</span>
+                    </div>
+                    {% elif item.status == 3 %}
+                    <!-- 成功 -->
+                    <div role="status">
+                        <span class="spinner-grow text-success" style="width: 1rem; height: 1rem;" role="status"></span>
+                        <span class="visually text-success" style="font-weight: bold;">成功</span>
+                    </div>
+                    {% elif item.status == 4 %}
+                    <!-- 失败 -->
+                    <div role="status">
+                        <span class="spinner-grow text-danger" style="width: 1rem; height: 1rem;" role="status"></span>
+                        <span class="visually text-danger" style="font-weight: bold;">失败</span>
+                    </div>
+                </div>
+                {% endif %}
+            </td>
+            <td>{{ item.name }}</td>
+            <td>
+                <a href="javascript:void(0);" onclick="showOrderDeleteConfirmModal('{{ item.order_id }}', '{{ item.order_identity }}')">
+                    <img src="/static/icon/trash3-fill.svg" alt="删除订单"
+                        style="width: 1em; height: 1em; vertical-align: middle; margin-right: 6px;">
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block script %}
+    <script type="module" src="/static/js/orderList.js"></script>
+{% endblock %}

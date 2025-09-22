@@ -1,0 +1,68 @@
+{% extends "base.html" %} <!-- 声明继承自 base.html -->
+
+<!-- 自定义页面标题 -->
+{% block title %}Order List{% endblock %}
+
+<!-- 填充页面 body 内容 -->
+{% block body %}
+    <!-- 折叠控制器 -->
+    <p>
+        <input type="checkbox" class="btn-check" id="btn-check-outlined1" autocomplete="off" checked>
+        <label class="btn btn-outline-primary" for="btn-check-outlined1" data-bs-toggle="collapse" data-bs-target="#collapse1"
+               aria-expanded="false" aria-controls="collapse1">
+            模版1
+        </label>
+        <input type="checkbox" class="btn-check" id="btn-check-outlined2" autocomplete="off">
+        <label class="btn btn-outline-primary" for="btn-check-outlined2" data-bs-toggle="collapse" data-bs-target="#collapse2"
+               aria-expanded="false" aria-controls="collapse2">
+            模版2
+        </label>
+<!--        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapse1">模版1</a>-->
+<!--        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">模版2</button>-->
+    </p>
+    <!-- 折叠区域 -->
+    <div class="collapse show" id="collapse1">
+        <div class="card card-body">
+            <form id="form1">
+                <div class="mb-3">
+                    <label for="basic-url" class="form-label">URL</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon3">https://example.com/{{ user_name }}/</span>
+                        <input type="text" name="url" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                    </div>
+                    <div class="form-text">填入目标地址</div>
+                </div>
+                <div class="mb-3">
+                    <label for="count-range" class="form-label">数量: <span id="count-value">1</span></label>
+                    <input type="range" name="count" class="form-range" min="1" max="666" step="1" id="count-range">
+                </div>
+                <button type="button" onclick="handleOrderCreateBtnOnclick('#form1')" class="btn btn-outline-success">提交</button>
+            </form>
+        </div>
+    </div>
+    <div class="collapse" id="collapse2">
+        <div class="card card-body">
+            <form id="form2">
+                <div class="mb-3">
+                    <label for="f2-basic-url" class="form-label">URL</label>
+                    <div class="input-group">
+                        <span class="input-group-text">https://example.com/{{ user_name }}/</span>
+                        <input type="text" name="url" class="form-control" id="f2-basic-url"
+                               aria-describedby="basic-addon3">
+                    </div>
+                    <div class="form-text">填入目标地址</div>
+                </div>
+                <div class="mb-3">
+                    <label for="count-range" class="form-label">数量: <span id="f2-count-value">1</span></label>
+                    <input type="range" name="count" class="form-range" min="1" max="666" step="1" id="f2-count-range">
+                </div>
+                <button type="button" onclick="handleOrderCreateBtnOnclick('#form2')" class="btn btn-outline-success">提交</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="module" src="/static/js/orderCreate.js"></script>
+{% endblock %}
+
