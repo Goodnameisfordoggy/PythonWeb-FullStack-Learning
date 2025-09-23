@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}默认标题{% endblock %}</title> <!-- 子模板可自定义标题 -->
+
+    <!-- 共用的静态资源（如 Bootstrap CSS）也放这里，避免重复引用 -->
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap.css' %}">
+    <style>
+        {% block style %}{% endblock %}
+    </style>
+</head>
+<body>
+    <!-- 共用导航栏 -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Django App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- 左侧导航项 -->
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/list">用户管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/order/list/">订单管理</a>
+                    </li>
+                </ul>
+
+                <!-- 右侧下拉菜单 -->
+                <ul class="navbar-nav ms-auto"> <!-- ms-auto 关键类：将这个容器推到右侧 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            {{ user_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end ">
+                            <li>
+                                <a class="dropdown-item" style="font-size: 16px" href="/user/homepage">
+                                    <img src="{% static 'img/file-earmark-person-fill.svg' %}" alt="个人主页"
+                                         style="width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 2px;">
+                                    个人主页
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" style="font-size: 16px" href="/order/create/">
+                                    <img src="{% static 'img/plus-square.svg' %}" alt="创建订单"
+                                         style="width: 1.2em; height: 1.2em; vertical-align: middle; margin-right: 2px;">
+                                    创建订单
+                                </a>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 弹窗 -->
+    <div class="modal fade" id="baseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="baseModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="baseModalLabel">未设置标题</h1>
+                    <!-- data-bs-dismiss控制Modal的关闭 -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    未设置弹窗内容
+                </div>
+                <div class="modal-footer">
+                    <!-- 取消按钮 -->
+                    <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <!-- 确认按钮 -->
+                    <button type="button" id="confirm" class="btn btn-primary" data-bs-dismiss="modal">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 子模板内容区域 -->
+    <div class="container mt-3">
+        {% block body %}{% endblock %}
+    </div>
+
+    <!-- 共用的 JS 资源 -->
+    <!-- 先引入 Popper.js（生产环境版本，体积小） -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/js/bootstrap.js' %}"></script>
+    {% block script %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误 - 不支持的请求类型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        danger: '#EF4444',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .error-container {
+                min-height: 100vh;
+            }
+            .error-card {
+                max-width: 500px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .error-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .error-icon {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+<div class="error-container flex flex-col items-center justify-center p-4">
+    <div class="error-card bg-white rounded-xl shadow-lg overflow-hidden w-full">
+        <div class="bg-danger text-white p-6 text-center">
+            <div class="error-icon inline-block">
+                <i class="fa fa-exclamation-triangle text-6xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold mt-4">405 错误</h1>
+            <p class="text-xl mt-2">不支持的请求类型</p>
+        </div>
+
+        <div class="p-6">
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold text-dark mb-2">错误信息</h2>
+                <p class="text-gray-600">服务器不支持当前请求所使用的 HTTP 方法。</p>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-dark mb-2">允许的请求方法</h2>
+                <div class="bg-light rounded-lg p-4">
+                    <code class="text-primary font-mono">详见README</code>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <a href="#"
+                   class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    <i class="fa fa-arrow-left mr-2"></i>
+                    返回上一页
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-gray-500 mt-6 text-sm">
+        请检查您的请求方法是否正确，或联系系统管理员获取帮助。
+    </p>
+</div>
+</body>
+</html>
