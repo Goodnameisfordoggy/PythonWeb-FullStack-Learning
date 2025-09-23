@@ -11,7 +11,6 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
-# decorators.py
 from functools import wraps
 from flask import abort, g
 from flask_app.models import User
