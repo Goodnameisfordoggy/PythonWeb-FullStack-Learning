@@ -11,8 +11,10 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAdminUser,
+    IsAuthenticatedOrReadOnly
+)
 
-class IsAdminUser(BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.is_staff

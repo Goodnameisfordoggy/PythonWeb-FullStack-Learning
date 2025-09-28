@@ -116,6 +116,30 @@ export async function restoreUser(userId) {
     }
 }
 
+export async function login(loginData) {
+    try {
+        const response = await fetch(`/api/accounts/login/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(loginData),
+          // credentials: 'include' // 携带 cookie（用于 Django Session 认证，跨域/同域均建议保留）
+        })
+        // 解析后端返回的 JSON 响应体
+        const data = await response.json();
+        // 处理解析后的业务数据
+        if (data.success) {
+            return data;
+        } else {
+            throw new Error(data.error || '登录失败');
+        }
+    } catch (error) {
+        console.error('Qaq出错了!', error);
+        throw error;
+    }
+}
 
 export async function logoutAccount(userId) {
     try {
@@ -145,6 +169,7 @@ const API = {
     deleteOrder,
     deleteUser,
     restoreUser,
+    login,
     logoutAccount,
 };
 export default API;

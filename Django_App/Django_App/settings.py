@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts.apps.AppMainConfig",
     "rest_framework",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,18 @@ AUTH_USER_MODEL = 'accounts.User'
 #         'rest_framework.authentication.TokenAuthentication',  # 使用Token认证
 #     ],
 # }
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_RENDERER_CLASSES': [
+#         'rest_framework.renderers.JSONRenderer',
+#         'rest_framework.renderers.BrowsableAPIRenderer',
+#     ],
+#     'JSONRenderer': {
+#         'INDENT': 4,  # 缩进4个空格，使JSON格式化
+#     }
+# }
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.CustomAuthBackend',
+    "django.contrib.auth.backends.ModelBackend",
+]

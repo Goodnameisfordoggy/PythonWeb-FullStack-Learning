@@ -37,31 +37,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     """用户模型"""
     # 主键
     # id = models.AutoField(primary_key=True, verbose_name="用户ID")
-
     user_identity = models.CharField(max_length=64, null=False, verbose_name="用户唯一标识")
-
     # 创建时间
     create_time = models.DateTimeField(null=False, default=datetime.now, auto_now=False, verbose_name="创建时间")
-
     # 手机号
     mobile = models.CharField(max_length=11, null=False, unique=True, verbose_name="手机号")
-
+    # 邮箱
+    email = models.EmailField(null=True, unique=True, verbose_name="邮箱")
     # 密码
     password = models.CharField(max_length=128, null=False, verbose_name="登录密码")
-
     # 用户名
     name = models.CharField(max_length=32, null=False, verbose_name="用户名")
-
+    # 昵称
+    nickname = models.CharField(max_length=32, null=True, verbose_name="昵称")
+    # 头像
+    avatar = models.ImageField(upload_to="avatar", null=True, verbose_name="个人头像")
+    # 个性签名
+    signature = models.CharField(max_length=100, null=True, verbose_name="个性签名")
     # 角色
     ROLE_CHOICES = [(1, '管理员'), (2, '客户')]
     role = models.SmallIntegerField(choices=ROLE_CHOICES, null=False, verbose_name='用户角色', help_text='(1=管理员, 2=客户)')
-
     # 能否登录 admin
     is_staff = models.BooleanField(default=False, verbose_name='管理员权限')
-
     # 账号是否启用
     is_active = models.BooleanField(default=True, verbose_name="账号是否启用")
-
     # 逻辑删除标记：0=未删除，1=已删除
     is_deleted = models.SmallIntegerField(null=False, default=0, verbose_name="逻辑删除标记", help_text="0=未删除，1=已删除")
 
@@ -72,9 +71,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         # 数据库表名
         db_table = "userinfo"
+        verbose_name = "用户"
+        verbose_name_plural = verbose_name
+        indexes = [
+            models.Index(fields=["user_identity"]),
+        ]
 
     def __str__(self):
         return f'User (name: {self.name}, id: {self.id})'
+
+    @property
+    def orders(self):
+        """获取用户的所有订单"""
+        return Order.objects.filter(user_identity=self.user_identity)
 
 
 class Order(models.Model):
@@ -82,28 +91,21 @@ class Order(models.Model):
     objects = models.Manager()
     # 主键
     # id = models.AutoField(primary_key=True, verbose_name="订单ID")
-
     # 订单唯一标识
     order_identity = models.CharField(max_length=64, null=False, verbose_name="订单唯一标识")
-
     # 创建时间 auto_now=False=每次修改不更新
     create_time = models.DateTimeField(null=False, default=datetime.now, auto_now=False, verbose_name="创建时间")
-
     # 订单关联URL
     url = models.CharField(max_length=255, null=False, verbose_name="订单关联URL")
-
     # 数量/次数
     count = models.IntegerField(null=False, verbose_name="数量/次数")
-
     # 关联用户唯一标识
     user_identity = models.CharField(max_length=64, null=False, verbose_name="关联用户编号",
         help_text="关联用户的唯一标识user_identity"
     )
-
     # 订单状态
     STATUS_CHOICES = [(1, "待处理"), (2, "正在处理"), (3, "成功"), (4, "失败")]
     status = models.SmallIntegerField(null=False, choices=STATUS_CHOICES, verbose_name="订单状态")
-
     # 逻辑删除标记
     is_deleted = models.SmallIntegerField(null=False, default=0, verbose_name="逻辑删除标记", help_text="0=未删除，1=已删除")
 
@@ -112,9 +114,8 @@ class Order(models.Model):
 
     class Meta:
         db_table = "order"
-        # 模型友好名称（Admin 后台显示）
-        # verbose_name = "订单"
-        # verbose_name_plural = "订单"  # 中文单复数一致，直接复用
+        verbose_name = "订单"
+        verbose_name_plural = verbose_name  # 中文单复数一致，直接复用
         # 添加索引优化查询
         indexes = [
             models.Index(fields=["order_identity"]),  # 订单唯一标识加索引，加速查询
@@ -125,17 +126,7 @@ class Order(models.Model):
     def __str__(self):
         return f'<Order (标识: {self.order_identity}, 状态: {self.get_status_display()})>'
 
-    @classmethod
-    def get_status_display(cls):
-        """"""
-        status_map = dict(cls.STATUS_CHOICES)
-        return status_map.get(cls.status, "未知状态")
-
-
-def dict_fetchall(cursor) -> list[dict]:
-    """
-    将cursor的查询结果转换为字典列表
-    键为字段名，值为对应字段的值
-    """
-    columns = [col[0] for col in cursor.description]
-    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    @property
+    def userinfo(self):
+        # 通过 user_identity 获取对应的用户信息
+        return User.objects.filter(user_identity=self.user_identity).first()

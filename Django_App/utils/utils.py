@@ -11,21 +11,4 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
-from rest_framework.response import Response
 
-def get_current_user_identity(request):
-    """
-    验证并获取用户标识
-    :param request: 请求对象
-    :return: 验证通过返回user_identity，否则返回错误Response对象
-    """
-    user = request.user
-    # 检查用户是否有user_identity属性且值有效
-    if not hasattr(user, "user_identity") or not user.user_identity:
-        return Response({
-            "code": 400,
-            "success": False,
-            "error": "缺失用户标识"
-        }, status=400)
-    # 验证通过，返回用户标识
-    return user.user_identity

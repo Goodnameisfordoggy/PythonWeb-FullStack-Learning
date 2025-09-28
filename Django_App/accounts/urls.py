@@ -12,16 +12,33 @@ Description:
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
 from django.urls import path
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
 
 from accounts import views
 
+# 生成 schema 视图
+schema_view = get_schema_view(
+   openapi.Info(
+      title="系统 API",  # 文档标题
+      default_version='v1',  # 版本
+      description="订单列表等 API 文档",  # 描述
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny,],  # 允许任何人访问文档
+)
 
 api_urlpatterns = [
+    path("login/", views.LoginView.as_view(), name="login"),
     path("user/logout/<str:user_identity>/", views.LogoutApiView.as_view(), name="api-user-logout"),
     path('user/delete/<str:user_identity>/', views.UserDeleteApiView.as_view(), name='api-user-delete'),
     path('user/restore/<str:user_identity>/', views.UserRestoreApiView.as_view(), name='api-user-restore'),
+    path("user/update/info", views.UserCustomInfoUpdateApiView.as_view(), name="api-user-info-update"),
     path("order/create/", views.OrderCreateApiView.as_view(), name="api-order-create"),
+    path("order/list/", views.OrderListView.as_view(), name="api-order-list"),
     path("order/delete/<str:order_identity>/", views.OrderDeleteApiView.as_view(), name="api-order-delete"),
+
 ]
 
 non_api_urlpatterns = [
@@ -31,6 +48,9 @@ non_api_urlpatterns = [
     path("order/create/", views.OrderCreateApiView.as_view(), name="order-create"),
     path('user/list/', views.UserListView.as_view(), name='user-list'),
     path('user/homepage/', views.UserHomeView.as_view(), name='user-homepage'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # 可选：Redoc 风格文档（另一种 UI）
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
 
