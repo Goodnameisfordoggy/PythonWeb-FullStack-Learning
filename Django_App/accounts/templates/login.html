@@ -44,6 +44,13 @@
             <label for="passwordInput" class="form-label">密码：</label>
             <input type="password" id="passwordInput" placeholder="请输入密码" class="form-control">
         </div>
+        <div class="input-group mb-3">
+            <input type="text" name="captcha" class="form-control" placeholder="请输入图片验证码" aria-label="Captcha"
+                   aria-describedby="captcha-image">
+            <span class="input-group-text" id="captcha-image">
+                <img src="/api/accounts/captcha/image" style="width: 120px;">
+            </span>
+        </div>
         <a href="javascript:void(0);" id="registerBtn" class="btn btn-outline-secondary">注册</a>
         <button type="button" id="loginBtn" class="btn btn-outline-success">登录</button>
         <span style="color:red; ">{{ error }}</span>

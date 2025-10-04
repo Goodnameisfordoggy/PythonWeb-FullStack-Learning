@@ -114,8 +114,8 @@ class UserCustomInfoSerializer(serializers.Serializer):
         return value
 
 
-    # def validate(self, data):
-    #     return data
+    def validate(self, data):
+        return data
 
 
 class OrderSerializer(serializers.ModelSerializer):

@@ -1,4 +1,5 @@
 accounts/static/plugins
+accounts/static/fonts
 accounts/migrations
 .idea/
 

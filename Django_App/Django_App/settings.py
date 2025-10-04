@@ -132,21 +132,16 @@ APPEND_SLASH = True  # 当请求的 URL 没有斜杠时，自动添加斜杠并�
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.TokenAuthentication',  # 使用Token认证
-#     ],
-# }
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_RENDERER_CLASSES': [
-#         'rest_framework.renderers.JSONRenderer',
-#         'rest_framework.renderers.BrowsableAPIRenderer',
-#     ],
-#     'JSONRenderer': {
-#         'INDENT': 4,  # 缩进4个空格，使JSON格式化
-#     }
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'JSONRenderer': {
+        'INDENT': 4,  # 缩进4个空格，使JSON格式化
+    },
+    'EXCEPTION_HANDLER': 'accounts.exceptions.custom_exception_handler',
+}
 
 AUTHENTICATION_BACKENDS = [
     'accounts.backends.CustomAuthBackend',

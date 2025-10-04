@@ -11,10 +11,21 @@ Description:
 
 Copyright (c) 2024-2025 by HDJ, All Rights Reserved.
 """
+from rest_framework.response import Response
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
-    IsAdminUser,
     IsAuthenticatedOrReadOnly
 )
+from accounts.exceptions import StructuredPermissionDenied
 
+class IsAdminUser(BasePermission):
+    """
+    管理员权限
+    """
+    message = "抱歉，您没有权限执行此操作，请联系管理员。"
+    def has_permission(self, request, view):
+        if request.user and request.user.is_staff:
+            return True
+        raise StructuredPermissionDenied(detail=self.message, biz_code=40301)
