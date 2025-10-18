@@ -46,3 +46,8 @@ class Paginator:
     def paginated_data(self):
         """获取当前页的数据切片"""
         return self.queryset[self.start:self.end]
+
+    @property
+    def current_page(self):
+        """当前分页页面序号"""
+        return self.page

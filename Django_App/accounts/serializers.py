@@ -18,18 +18,26 @@ from django.contrib.auth import get_user_model
 import accounts.models as accounts_models
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRSerializer(serializers.ModelSerializer):
+
+    role = serializers.SerializerMethodField()
+
     class Meta:
         # 序列化的模型
         model = get_user_model()
         # 全选字段
         # field = "__all__"
         # 指定字段，可动态调整
-        fields = ['id', 'user_identity', 'create_time', 'mobile', 'name', 'role', 'is_deleted']
+        fields = [
+            'id', 'user_identity', 'create_time', 'last_login', 'mobile', 'email', 'name', 'nickname',
+            'avatar', 'signature', 'role', 'is_staff', 'is_active', 'is_deleted']
         # 排除字段，其余字段全选
-        exclude = []
+        # exclude = []
         # 指定只读字段
-        read_only_fields = ['id', 'create_time']
+        read_only_fields = fields
+
+    def get_role(self, obj):
+        return obj.get_role_display()
 
 
 class UserCustomInfoSerializer(serializers.Serializer):
@@ -110,7 +118,7 @@ class UserCustomInfoSerializer(serializers.Serializer):
     def validate_mobile(self, value):
         if value is not None:
             if not re.match(r'^1[3-9]\d{9}$', value):
-                raise serializers.ValidationError("手机号格式不正确（需为11位有效数字）")
+                raise serializers.ValidationError("手机号格式不正确，请使用11位有效数字")
         return value
 
 
@@ -118,13 +126,13 @@ class UserCustomInfoSerializer(serializers.Serializer):
         return data
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderRSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
 
     class Meta:
         model = accounts_models.Order
         fields = ["id", "order_identity", "create_time", "url", "count", "status", "user_identity", "is_deleted"]
-        read_only_fields = fields  # 响应字段均为只读
+        read_only_fields = fields
 
     def get_status(self, obj):
         return obj.get_status_display()
@@ -141,5 +149,3 @@ class OrderCreateRequestSerializer(serializers.Serializer):
     """订单创建请求数据校验序列化器"""
     url = serializers.URLField(required=True)
     count = serializers.IntegerField(required=True, min_value=1)
-
-

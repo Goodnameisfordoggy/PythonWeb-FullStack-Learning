@@ -30,7 +30,9 @@ schema_view = get_schema_view(
 )
 
 api_urlpatterns = [
-    path("login/", user.LoginView.as_view(), name="login"),
+    path("login/", user.LoginApiView.as_view(), name="api-login"),
+    path("register/", user.RegisterApiView.as_view(), name="api-register"),
+    path('user/list/', user.UserListView.as_view(), name='api-user-list'),
     path("user/logout/<str:user_identity>/", user.LogoutApiView.as_view(), name="api-user-logout"),
     path('user/delete/<str:user_identity>/', user.UserDeleteApiView.as_view(), name='api-user-delete'),
     path('user/restore/<str:user_identity>/', user.UserRestoreApiView.as_view(), name='api-user-restore'),
@@ -42,8 +44,9 @@ api_urlpatterns = [
 ]
 
 non_api_urlpatterns = [
-    path("login/", user.LoginView.as_view(), name="login"),
+    path("login/", user.LoginApiView.as_view(), name="login"),
     path("register/", user.RegisterApiView.as_view(), name="register"),
+    path("order/list/", order.OrderListApiView.as_view(), name="order-list"),
     path("order/create/", order.OrderCreateApiView.as_view(), name="order-create"),
     path('user/list/', user.UserListView.as_view(), name='user-list'),
     path('user/homepage/', user.UserHomeView.as_view(), name='user-homepage'),

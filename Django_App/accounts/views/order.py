@@ -25,7 +25,7 @@ from accounts.permissions import (
     IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly,
 )
 from accounts.serializers import (
-    OrderSerializer, OrderRelatedUserSerializer, OrderCreateRequestSerializer,
+    OrderRSerializer, OrderRelatedUserSerializer, OrderCreateRequestSerializer,
 )
 from utils.logger import LOG
 from utils.func import generate_sha256_identifier
@@ -84,7 +84,7 @@ class OrderListApiView(APIView):
             # 序列化订单信息并插入关联用户信息
             orders_data = [
                 {**order, "user_info": all_users_map.get(order["user_identity"], {}), }
-                for order in OrderSerializer(paginator.paginated_data, many=True).data
+                for order in OrderRSerializer(paginator.paginated_data, many=True).data
             ]
         else:
             # 查询用户订单
@@ -94,7 +94,7 @@ class OrderListApiView(APIView):
             # 序列化订单信息并插入关联用户信息
             orders_data = [
                 {**order, "user_info": {**OrderRelatedUserSerializer(user).data}}
-                for order in OrderSerializer(paginator.paginated_data, many=True).data
+                for order in OrderRSerializer(paginator.paginated_data, many=True).data
             ]
             if not user:
                 return Response({"code": 40499, "success": False, "error": "用户不存在"}, status=404)
@@ -104,7 +104,7 @@ class OrderListApiView(APIView):
             "success": True,
             "message": f"{user.get_role_display()}{user.name}查询订单成功",
             "data": {
-                "page": page,
+                "page": paginator.page,
                 "total_pages": paginator.total_pages,
                 "page_size": self.PAGE_SIZE,
                 "orders": orders_data,
@@ -162,7 +162,7 @@ class OrderCreateApiView(APIView):
         # 写入 Redis 队列
 
         # 成功响应
-        response_serializer = OrderSerializer(order)
+        response_serializer = OrderRSerializer(order)
         LOG.info(f"用户:{user_identity}成功创建了订单:{order_id}")
         return Response({
             "code": 20102,

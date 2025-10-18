@@ -16,7 +16,11 @@ from django.http import HttpResponse
 from django.views import View
 from django.db.models import F, Q
 from django.contrib.auth import (
-    get_user_model, authenticate, login as django_login, logout as django_logout)
+    get_user_model,
+    authenticate,
+    login as django_login,
+    logout as django_logout
+)
 from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,18 +31,16 @@ from drf_yasg import openapi
 from accounts.permissions import (
     AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly,
 )
-from accounts.serializers import UserSerializer, UserCustomInfoSerializer
+from accounts.serializers import UserRSerializer, UserCustomInfoSerializer
+from utils import (
+    LOG, ImageCaptchaGenerator, Paginator, generate_sha256_identifier, add_error)
 
-from utils.logger import LOG
-from utils.func import generate_sha256_identifier
-from utils.captcha import ImageCaptchaGenerator
-from utils.utils import Paginator
 
 
 User = get_user_model()
 
 
-class LoginView(APIView):
+class LoginApiView(APIView):
     """用户登录"""
     permission_classes = [AllowAny]
 
@@ -46,37 +48,50 @@ class LoginView(APIView):
         return render(request, template_name="login.html")
 
     def post(self, request):
+        errors = {}
         # 获取表单数据
-        role = request.data.get('role')
         mobile = request.data.get('mobile')
         pwd = request.data.get('pwd')
-        LOG.debug(f"role:{role}, mobile:{mobile}, pwd:{pwd}")
-        # 验证用户
-        user = authenticate(request, mobile=mobile, password=pwd, role=role)
+        captcha = request.data.get('captcha')
+        LOG.debug(f"【LoginView】mobile:{mobile}, pwd:{pwd}, captcha:{captcha}")
+        if not mobile:
+            add_error(errors, 'mobile', '手机号不能为空')
+        if not pwd:
+            add_error(errors, 'pwd', '密码不能为空')
+        # 比对验证码
+        if not captcha or request.session['captcha_code'].lower() != captcha.lower():
+            add_error(errors, 'captcha', '验证码不正确')
+        # 验证用户信息
+        user = authenticate(request, mobile=mobile, password=pwd)
         if not user:
-            # 用户不存在或信息错误
-            return Response({"code": 40099, "success": False, "error": ["用户信息校验失败", "用户名或密码错误"]}, status=400)
-        else:
-            # 绑定登录状态
-            django_login(request, user)  # 用Django内置login函数绑定request.user与当前用户
-            # 成功响应
-            response = Response({
-                "code": 20099,
-                "success": True,
-                "message": "登录成功",
-                "data": {"1": "11"}
-            })
-            # 设置Cookies
-            response.set_cookie(
-                key="user_auth",
-                value=user.id,
-                max_age=60 * 60 * 24 * 7,  # 有效期：7天
-                httponly=True,  # 关键：禁止JS读取，防XSS攻击
-                secure=request.is_secure(),  # 生产环境启用（HTTPS下才生效）
-                samesite="Lax",  # 限制跨站请求，防CSRF攻击
-                path="/",
-            )
-            return response
+            # 混淆用户名和密码错误信息
+            add_error(errors, "mobile", "用户名或密码错误")
+            add_error(errors, "password", "用户名或密码错误")
+        # 错误响应
+        if errors:
+            return Response({"code": 40099, "success": False, "error": errors}, status=400)
+        # 绑定登录状态
+        django_login(request, user)  # 用Django内置login函数绑定request.user与当前用户
+        # 成功响应
+        response = Response({
+            "code": 20099,
+            "success": True,
+            "message": "登录成功",
+            "data": {
+                "user": UserRSerializer(user).data,
+            }
+        })
+        # 设置Cookies
+        response.set_cookie(
+            key="user_auth",
+            value=user.id,
+            max_age=60 * 60 * 24 * 7,  # 有效期：7天
+            httponly=True,  # 关键：禁止JS读取，防XSS攻击
+            secure=request.is_secure(),  # 生产环境启用（HTTPS下才生效）
+            samesite="Lax",  # 限制跨站请求，防CSRF攻击
+            path="/",
+        )
+        return response
 
 
 class LogoutApiView(APIView):
@@ -104,13 +119,19 @@ class RegisterApiView(APIView):
         return render(request, "register.html")
 
     def post(self, request):
-        username = request.POST.get("username", "").strip()  # strip() 去除前后空格
-        password = request.POST.get("password", "").strip()
-        mobile = request.POST.get("mobile", "").strip()
-
+        errors = {}
+        # 校验参数，去除前后空格
+        username = request.data.get("username", "").strip()
+        password = request.data.get("pwd", "").strip()
+        mobile = request.data.get("mobile", "").strip()
+        captcha = request.data.get("captcha", "").strip()
+        LOG.debug(f"【RegisterApiView】username:{username}, password:{password}, mobile:{mobile}")
+        # 比对验证码
+        if not captcha or request.session['captcha_code'].lower() != captcha.lower():
+            add_error(errors, 'captcha', '验证码不正确')
         # 数据格式验证
         serializer = UserCustomInfoSerializer(data={"name": username, "password": password, "mobile": mobile})
-        if not serializer.is_valid(raise_exception=True):
+        if not serializer.is_valid():
             return Response({"code": 40002, "success": False, "error": serializer.errors}, status=400)
 
         # 检查用户名/手机号是否已存在
@@ -119,9 +140,9 @@ class RegisterApiView(APIView):
         if duplicate_user:
             # 判断具体重复字段
             if duplicate_user.name == username:
-                return Response({"code": 40004, "success": False, "error": "用户名已存在"}, status=400)
+                return Response({"code": 40004, "success": False, "error": {"username": "用户名已存在"}}, status=400)
             if duplicate_user.mobile == mobile:
-                return Response({"code": 40004, "success": False, "error": "手机号已被注册"}, status=400)
+                return Response({"code": 40004, "success": False, "error": {"username": "手机号已被注册"}}, status=400)
 
         # 生成用户标识
         user_identity = generate_sha256_identifier()
@@ -138,11 +159,10 @@ class RegisterApiView(APIView):
         except Exception as e:
             return Response({"code": 50001, "success": False, "error": str(e)}, status=500)
 
-        # 注册成功，重定向到登录页
-        return redirect("/login/")
+        return Response({"code": 20101, "success": True, "message": "用户注册成功"}, status=201)
 
 
-class CaptchaImage(View):
+class CaptchaImage(APIView):
     """图片验证码"""
     def get(self, request):
         generator = ImageCaptchaGenerator(
@@ -156,12 +176,9 @@ class CaptchaImage(View):
             interference_circles=2,
         )
         code, image = generator.generate()
-        stream = io.BytesIO()
-        image.save(stream, format='JPEG')
-        image = f"data:image/jpeg;base64,{generator.base64_image}"
         request.session['captcha_code'] = code
-        return HttpResponse(stream.getvalue())
-
+        LOG.debug(f"current captcha code:{request.session['captcha_code']}")
+        return Response({"code": 20001, "success": True, "image": generator.base64_image})
 
 
 class UserListView(APIView):
@@ -170,17 +187,21 @@ class UserListView(APIView):
 
     def get(self, request):
         # 查询用户信息并序列化
-        active_users = User.objects.filter(is_deleted=0)
-        active_users_list = UserSerializer(active_users, many=True).data
-        deleted_users = User.objects.filter(is_deleted=1)
-        deleted_users_list = UserSerializer(deleted_users, many=True).data
+        users = User.objects.all()
+        users_list = UserRSerializer(users, many=True).data
+
+        # active_users = User.objects.filter(is_deleted=0)
+        # active_users_list = UserRSerializer(active_users, many=True).data
+        # deleted_users = User.objects.filter(is_deleted=1)
+        # deleted_users_list = UserRSerializer(deleted_users, many=True).data
         return Response({
             "code": 20001,
             "success": True,
             "message": "",
             "data": {
-                "active_users": active_users_list,
-                "deleted_users": deleted_users_list
+                "users": users_list,
+                # "active_users": active_users_list,
+                # "deleted_users": deleted_users_list
             }
         },)
 

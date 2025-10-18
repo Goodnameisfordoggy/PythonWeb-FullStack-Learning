@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     "accounts.apps.AppMainConfig",
     "rest_framework",
     "drf_yasg",
+    "corsheaders", # 跨域 app
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", # 跨域中间件放在最前面
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -147,3 +149,30 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.CustomAuthBackend',
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+# 允许的前端域名
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+# 允许跨域请求携带 Cookie（Django Session 认证必需）
+CORS_ALLOW_CREDENTIALS = True
+# 允许跨域设置 sessionid Cookie
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = False # http环境
+
+
+
